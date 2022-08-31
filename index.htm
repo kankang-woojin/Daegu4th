@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	
+	<title>대구빅데이터 분석 경진대회</title>
+
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./css/leaflet.css">
+	<link rel="stylesheet" href="./css/font-awesome5.8.2.css">
+    <link rel="stylesheet"  href="./css/bootstrap.min.css">
+
+	<script src="./js/leaflet/leaflet.js"></script>
+
+	<style>
+		@font-face {
+			font-family: 'ngb';
+			src: url('./webfonts/NanumGothicBold.ttf');
+		}
+
+		@font-face {
+			font-family: 'ng';
+			src: url('./webfonts/NanumGothic.ttf');
+		}
+
+		html, body {
+			height: 100%;
+			margin: 0;
+			font-family:'ng', sans-serif;
+		}
+		.leaflet-container {
+			height: 100%;
+			width: 100%;
+			max-width: 100%;
+			max-height: 100vh;
+		}
+        .map { 
+            height: 60vh; 
+            max-height: 100vh;
+			z-index: 0;
+			margin: 1em 0 1em 0;
+        }
+
+	</style>
+</head>
+<body>
+	<header class="p-2 bg-white text-dark border-bottom shadow-sm">
+		<div class="container">
+			<div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+				<a href="./" class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
+					<img class="bi me-2" height="32" role="img" aria-label="Bootstrap" src='./img/daegu.png' />
+				</a>
+
+				<ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+					<li><a href="./" class="nav-link px-2 text-secondary"><b>HOME</b></a></li>
+				</ul>
+
+			</div>
+		</div>
+	</header>
+	<div class="container-xxl py-4">
+		<div class="p-3 bg-light rounded-3 shadow-sm">
+			<div class='row'>
+				<div class='col-12' style='margin-bottom:1em'>
+					<div class="card shadow-sm">
+						<div class="card-body">
+							<p class="card-text" style='text-align:center; font-weight:600;'>대구광역시 생활시설 접근성 분석</p>
+						</div>
+					</div>
+					<div style='margin: 1em 0 1em 0;'>
+						<ul class="nav justify-content-center nav-pills nav-fill shadow-sm" id="myTab" role="tablist">
+							<li class="nav-item" role="presentation">
+								<button class="nav-link active" id="adcl" data-bs-toggle="tab" data-bs-target="#adcl_pane" type="button" role="tab" aria-controls="adcl_pane" aria-selected="false"><b>문화시설</b></button>
+							</li>
+							<li class="nav-item" role="presentation">
+								<button class="nav-link" id="edu" data-bs-toggle="tab" data-bs-target="#edu_pane" type="button" role="tab" aria-controls="edu_pane" aria-selected="true"><b>교육시설</b></button>
+							</li>
+							<li class="nav-item" role="presentation">
+								<button class="nav-link" id="medi" data-bs-toggle="tab" data-bs-target="#medi_pane" type="button" role="tab" aria-controls="medi_pane" aria-selected="false"><b>의료시설</b></button>
+							</li>
+							<li class="nav-item" role="presentation">
+								<button class="nav-link" id="park" data-bs-toggle="tab" data-bs-target="#park_pane" type="button" role="tab" aria-controls="park_pane" aria-selected="false"><b>체육시설</b></button>
+							</li>
+							<li class="nav-item" role="presentation">
+								<button class="nav-link" id="poli" data-bs-toggle="tab" data-bs-target="#poli_pane" type="button" role="tab" aria-controls="poli_pane" aria-selected="false"><b>일상생활시설</b></button>
+							</li>
+						</ul>
+						<div class="tab-content"  style='padding:1em;'>
+							<div class="tab-pane fade show active" id="adcl_pane" role="tabpanel" aria-labelledby="adcl" tabindex="0">
+								<button class="btn rounded-pill btn-sm btn-outline-dark" type='button' onclick='call_map("공공도서관")'><i class="fas fa-building">&nbsp;</i><b>공공도서관</b></button>
+								<button class="btn rounded-pill btn-sm btn-outline-dark" type='button' onclick='call_map("미술관")'><i class="fas fa-building">&nbsp;</i><b>미술관</b></button>
+								<button class="btn rounded-pill btn-sm btn-outline-dark" type='button' onclick='call_map("박물관")'><i class="fas fa-building">&nbsp;</i><b>박물관</b></button>
+								<button class="btn rounded-pill btn-sm btn-outline-dark" type='button' onclick='call_map("공연장")'><i class="fas fa-building">&nbsp;</i><b>공연장</b></button>
+							</div>
+							<div class="tab-pane fade" id="edu_pane" role="tabpanel" aria-labelledby="edu" tabindex="0">
+							<button class="btn rounded-pill btn-sm btn-outline-dark" type='button' onclick='call_map("유치원")'><i class="fas fa-school">&nbsp;</i><b>유치원</b></button>
+								<button class="btn rounded-pill btn-sm btn-outline-dark" type='button' onclick='call_map("초등학교")'><i class="fas fa-school">&nbsp;</i><b>초등학교</b></button>
+								<button class="btn rounded-pill btn-sm btn-outline-dark" type='button' onclick='call_map("중학교")'><i class="fas fa-school">&nbsp;</i><b>중학교</b></button>
+								<button class="btn rounded-pill btn-sm btn-outline-dark" type='button' onclick='call_map("고등학교")'><i class="fas fa-school">&nbsp;</i><b>고등학교</b></button>
+							</div>
+							<div class="tab-pane fade" id="medi_pane" role="tabpanel" aria-labelledby="medi" tabindex="0">
+								<button class="btn rounded-pill btn-sm btn-outline-dark" type='button' onclick='call_map("약국")'><i class="fas fa-capsules">&nbsp;</i><b>약국</b></button>
+								<button class="btn rounded-pill btn-sm btn-outline-dark" type='button' onclick='call_map("1차병원")'><i class="fas fa-hospital">&nbsp;</i><b>1차병원</b></button>
+								<button class="btn rounded-pill btn-sm btn-outline-dark" type='button' onclick='call_map("2차병원")'><i class="fas fa-hospital">&nbsp;</i><b>2차병원</b></button>
+								<button class="btn rounded-pill btn-sm btn-outline-dark" type='button' onclick='call_map("3차병원")'><i class="fas fa-hospital">&nbsp;</i><b>3차병원</b></button>
+							</div>
+							<div class="tab-pane fade" id="park_pane" role="tabpanel" aria-labelledby="park" tabindex="0">
+								<button class="btn rounded-pill btn-sm btn-outline-dark" type='button' onclick='call_map("수영장")'><i class="fas fa-tree">&nbsp;</i><b>수영장</b></button>
+								<button class="btn rounded-pill btn-sm btn-outline-dark" type='button' onclick='call_map("실내")'><i class="fas fa-tree">&nbsp;</i><b>실내</b></button>
+								<button class="btn rounded-pill btn-sm btn-outline-dark" type='button' onclick='call_map("실외")'><i class="fas fa-tree">&nbsp;</i><b>실외</b></button>
+							</div>
+							<div class="tab-pane fade" id="poli_pane" role="tabpanel" aria-labelledby="poli" tabindex="0">
+								<button class="btn rounded-pill btn-sm btn-outline-dark" type='button' onclick='call_map("주차장")'><i class="fas fa-user-shield">&nbsp;</i><b>주차장</b></button>
+								<button class="btn rounded-pill btn-sm btn-outline-dark" type='button' onclick='call_map("공원")'><i class="fas fa-user-shield">&nbsp;</i><b>공원</b></button>
+								<button class="btn rounded-pill btn-sm btn-outline-dark" type='button' onclick='call_map("대규모점포")'><i class="fas fa-user-shield">&nbsp;</i><b>대규모점포</b></button>
+							</div>
+						</div>
+					</div>
+					<b >범례</b>
+					<div class="progress shadow-lg" style='margin:1em 0 1em 0; height:3em;'>
+						<div class="progress-bar" role="progressbar" style="width: 4%; background-color:#053061; color:black; font-weight:600;" aria-valuenow="4" aria-valuemin="0" aria-valuemax="100">1등급</div>
+						<div class="progress-bar" role="progressbar" style="width: 7%; background-color:#2870b1; color:black; font-weight:600;" aria-valuenow="11" aria-valuemin="0" aria-valuemax="100">2등급</div>
+						<div class="progress-bar" role="progressbar" style="width: 12%; background-color:#68abd0; color:black; font-weight:600;" aria-valuenow="23" aria-valuemin="0" aria-valuemax="100">3등급</div>
+						<div class="progress-bar" role="progressbar" style="width: 17%; background-color:#c0dceb; color:black; font-weight:600;" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100">4등급</div>
+						<div class="progress-bar" role="progressbar" style="width: 20%; background-color:#f6f7f7; color:black; font-weight:600;" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100">5등급</div>
+						<div class="progress-bar" role="progressbar" style="width: 17%; background-color:#fbceb7; color:black; font-weight:600;" aria-valuenow="77" aria-valuemin="0" aria-valuemax="100">6등급</div>
+						<div class="progress-bar" role="progressbar" style="width: 12%; background-color:#e58368; color:black; font-weight:600;" aria-valuenow="89" aria-valuemin="0" aria-valuemax="100">7등급</div>
+						<div class="progress-bar" role="progressbar" style="width: 7%; background-color:#bb2a34; color:black; font-weight:600;" aria-valuenow="96" aria-valuemin="0" aria-valuemax="100">8등급</div>
+						<div class="progress-bar" role="progressbar" style="width: 4%; background-color:#67001f; color:black; font-weight:600;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">9등급</div>
+					</div>
+					<div class='w-100 map shadow' id='map'></div>
+				</div>
+				<div class='col-12'>
+					<ul class="list-group shadow-sm">
+						<li class="list-group-item d-flex justify-content-between align-items-center">
+							<span><i class="fas fa-globe-asia bg-success text-white" style='width:1.5em; font-size:.9em; border-radius:.5em; padding:.1em; text-align:center;'></i><b>&nbsp;대구광역시 250m*250m 접근성 데이터</b></span>
+							<a href="#" download> <button class="rounded-pill btn btn-outline-primary btn-sm" data-bs-toggle="tooltip" title="download"><i class="fas fa-file-download"></i></button></a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+	<footer class="pt-4 my-md-5 pt-md-5 border-top shadow-sm">
+		<div class="row" style='max-width:100%;'>
+			<div class="col-12 col-md" style='text-align:center;'>
+				<p>본 웹사이트는 <b>'제4회 대구 빅데이터 분석 경진대회'</b>의 분석 과제 일환으로 개발되었습니다.</p>
+				<small class="d-block mb-3 text-muted">&copy; Team GANA(2022)</small>
+			</div>
+		</div>
+	</footer>
+	
+<script src="./js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+<script type="text/javascript" src="./js/leaflet/daegu_var.js"></script>
+<script type="text/javascript">
+	
+	facil_grades_per = {
+		'1차병원': [0.03970369795610484, 0.07953092863981083, 0.11732522640225289, 0.189915570988164, 0.319236634282818, 0.49915468094673004, 0.6361880597652095, 0.7805910007637549], 
+		'2차병원': [0.063378102696529, 0.104252853931442, 0.139800506525414, 0.2103417669786238, 0.33755467211255313, 0.5082707885832208, 0.6774851829046306, 0.8323963365158253], 
+		'3차병원': [0.0, 1e-15, 0.025494270343514, 0.112903683485526, 0.216713176382128, 0.32936786184275746, 0.474337778254229, 0.5719757601165617], 
+		'고등학교': [0.04442691281672, 0.099143506646815, 0.1798546267828893, 0.258140307159104, 0.3230580653919152, 0.43659115899211326, 0.5739052471971134, 0.678548716373717], 
+		'공공도서관': [0.036343857936178, 0.08332152675714462, 0.157259677551669, 0.21313007758493, 0.27388736697355, 0.4239611424629897, 0.5429341849657374, 0.6783321255357212], 
+		'공연장': [0.001644931364005, 0.002824257233149, 0.005340970157519, 0.05551115786043369, 0.14777896889169054, 0.24117569959351653, 0.31510282466702744, 0.3700051323170281], 
+		'공원': [0.0453399952540998, 0.0996177020849691, 0.18979108700839684, 0.3440329028485206, 0.4835391351333438, 0.5541270784827964, 0.6113710424613406, 0.6569285010840404], 
+		'대규모점포': [0.02779959224086276, 0.05081481124785934, 0.071225184905858, 0.11734464814038421, 0.246072994700191, 0.3875108446258499, 0.4855935599427475, 0.5697608620702886], 
+		'미술관': [0.0, 1e-15, 2e-15, 0.021717696298576, 0.074003967007052, 0.149354279568498, 0.231115380104683, 0.272030483780064], 
+		'박물관': [0.0, 1e-15, 0.002439770863222, 0.01927780424192261, 0.082181148053031, 0.157561823559496, 0.2145931105496414, 0.25816456817873207], 
+		'수영장': [0.0, 0.012745280857345, 0.044969986256413, 0.088435334790026, 0.169347574176315, 0.278427408250661, 0.379104831848867, 0.428389481049023], 
+		'실내': [0.027797959152707, 0.046262289641278, 0.12274309612749655, 0.21924739235395785, 0.393470566473202, 0.5804606085388768, 0.7223855498067234, 0.8426418962621661], 
+		'실외': [0.043557626717597, 0.11165028952698017, 0.1653967104913354, 0.2604979787251734, 0.3856750815316704, 0.532219414200333, 0.652950045902498, 0.7593187269222628], 
+		'약국': [0.044935431201145806, 0.10385711631418083, 0.1813190344172239, 0.244944428094031, 0.34466120114718, 0.4979271454811301, 0.6502516701616847, 0.79366421603059], 
+		'유치원': [0.06270616137031829, 0.1383870351857067, 0.23066780084181354, 0.33408914561308656, 0.4656180855732698, 0.627979729557535, 0.7932893039164728, 0.9089977148340642], 
+		'주차장': [0.04995162897453756, 0.10218382118940729, 0.2088812727476508, 0.290842275084008, 0.40386777366616355, 0.5978391628734295, 0.7896830355509308, 0.9273789636663027], 
+		'중학교': [0.05619398888291052, 0.11374734739016422, 0.220706539826872, 0.324246158015019, 0.4267049833153778, 0.5315201854419996, 0.6785731477740079, 0.7733555605933466], 
+		'초등학교': [0.07197912176579765, 0.15182673586103831, 0.27941416845128536, 0.3854121767365232, 0.5093220806089573, 0.6396217271124182, 0.7888783092628724, 0.9124065191909151]
+	};
+
+	// 지도 생성
+	var map_generation_param = {
+		dragging: true,
+        minZoom:5, // Map's Minimum Zoom Size
+        maxZoom:17, // Map's Maximum Zoom Size
+		fadeAnimation: true,
+    	zoomAnimation: true
+    }
+
+	// 지도 범위 이동 설정
+	var southWest = L.latLng(31, 123);
+	var northEast = L.latLng(39, 133);
+	var bounds = L.latLngBounds(southWest, northEast);
+
+	var map = L.map('map', map_generation_param).setView([35.8714, 128.6014], 12);;
+
+	// 지도 타일 불러오기
+
+	var osm_url = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+
+	var tiles = L.tileLayer(osm_url, {
+		attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, ' +
+			'Construction © <a href="http://widit.knu.ac.kr/~rkddnwls1234/MyWeb/">Woojin KANG</a>', // Map's Attribution 
+		tileSize: 512,
+		zoomOffset: -1
+	})
+	
+	tiles.addTo(map);
+
+	L.Control.Watermark = L.Control.extend({
+		onAdd: function(map) {
+			var img = L.DomUtil.create('img');
+
+			img.src = './img/daegu.png';
+			img.style.width = '100px';
+			img.style.margin = '1em 1em 2em 0em';
+
+			return img;
+		},
+
+		onRemove: function(map) {
+			// Nothing to do here
+		}
+	});
+
+	L.control.watermark = function(opts) {
+		return new L.Control.Watermark(opts);
+	}
+
+	L.control.watermark({ position: 'bottomleft' }).addTo(map);
+
+	clmn = '공공도서관';
+	grades = getGrade(clmn);
+
+	layers = L.geoJson(DaeguAccessGrid, {
+		style: function(feature){return style(feature, clmn, grades)},
+	//onEachFeature: onEachFeature,
+	});
+
+	// GeoJson Style
+	function style(feature, clmn, grades) {	
+		return {
+			weight: 1,
+			opacity: .7,
+			color: getColor(feature.properties[clmn], grades),
+			dashArray: '',
+			fillOpacity: 0.7,
+			fillColor: getColor(feature.properties[clmn], grades)
+		};
+	}
+
+	function getGrade(clmn){
+		var grades = facil_grades_per[clmn];
+		
+		return grades
+	}
+
+	function getColor(feature, grades) {
+
+		d = feature;
+		return d <= grades[0] ? '#67001f' : // 9등급
+			d <= grades[1] ? '#bb2a34' : // 8등급
+			d <= grades[2] ? '#e58368' : // 7등급
+			d <= grades[3] ? '#fbceb7' : // 6등급
+			d <= grades[4] ? '#f6f7f7' : // 5등급
+			d <= grades[5] ? '#c0dceb' : // 4등급
+			d <= grades[6] ? '#68abd0' : // 3등급
+			d <= grades[7] ? '#2870b1' : '#053061'; // 2등급: 1등급
+	}
+
+
+	layers.addTo(map);
+
+	function call_map(clmn){
+
+		map.removeLayer(layers);
+
+		grades = getGrade(clmn);
+
+		layers = L.geoJson(DaeguAccessGrid, {
+			style: function(feature){return style(feature, clmn, grades)},
+			//onEachFeature: onEachFeature,
+		});
+
+
+		map.addLayer(layers);
+	}
+
+
+</script>
+</body>
+</html>
